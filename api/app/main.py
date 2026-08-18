@@ -4,8 +4,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1 import assets, auth, incidents
 from app.core.config import get_settings
 from app.db.init_db import init_db
+from app.ws import agent_stream
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,6 +30,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+app.include_router(auth.router)
+app.include_router(incidents.router)
+app.include_router(assets.router)
+app.include_router(agent_stream.router)
 
 
 @app.get("/health")
