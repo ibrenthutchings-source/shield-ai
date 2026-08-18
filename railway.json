@@ -1,0 +1,18 @@
+{
+  "services": [
+    {
+      "name": "api",
+      "port": "8000",
+      "build": { "path": "./" }
+    },
+    {
+      "name": "web",
+      "port": "3000",
+      "build": { "path": "./web" }
+    },
+    {
+      "name": "worker",
+      "build": { "path": "./" }
+    }
+  ]
+}
