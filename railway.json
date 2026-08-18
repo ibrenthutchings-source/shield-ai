@@ -1,0 +1,38 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "services": {
+    "web": {
+      "build": {
+        "builder": "DOCKERFILE",
+        "dockerfilePath": "web/Dockerfile",
+        "rootDirectory": "web"
+      },
+      "deploy": {
+        "healthcheckPath": "/",
+        "restartPolicyType": "ON_FAILURE"
+      }
+    },
+    "api": {
+      "build": {
+        "builder": "DOCKERFILE",
+        "dockerfilePath": "api/Dockerfile",
+        "rootDirectory": "api"
+      },
+      "deploy": {
+        "healthcheckPath": "/health",
+        "restartPolicyType": "ON_FAILURE"
+      }
+    },
+    "worker": {
+      "build": {
+        "builder": "DOCKERFILE",
+        "dockerfilePath": "api/Dockerfile",
+        "rootDirectory": "api"
+      },
+      "deploy": {
+        "startCommand": "celery -A app.worker.celery_app worker --loglevel=info",
+        "restartPolicyType": "ON_FAILURE"
+      }
+    }
+  }
+}
