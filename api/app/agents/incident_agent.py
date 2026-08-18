@@ -26,7 +26,7 @@ def _default_phase_generator(phase: IncidentPhaseName, context: IncidentContext)
         raise RuntimeError("ANTHROPIC_API_KEY is required to generate incident playbooks")
 
     parser = PydanticOutputParser(pydantic_object=PlaybookPhase)
-    llm = ChatAnthropic(model="claude-3-5-sonnet-latest", api_key=settings.anthropic_api_key)
+    llm = ChatAnthropic(model="claude-sonnet-5", api_key=settings.anthropic_api_key)
     prompt = ChatPromptTemplate.from_messages(
         [
             (
