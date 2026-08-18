@@ -1,7 +1,18 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+import { useAuth } from "@/lib/auth-context";
+
 export default function HomePage() {
-  return (
-    <main className="flex min-h-screen items-center justify-center">
-      <h1 className="text-2xl font-semibold">ShieldAI</h1>
-    </main>
-  );
+  const { token, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoading) return;
+    router.replace(token ? "/dashboard" : "/login");
+  }, [isLoading, token, router]);
+
+  return null;
 }
