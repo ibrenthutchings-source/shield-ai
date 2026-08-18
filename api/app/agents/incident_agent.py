@@ -14,9 +14,14 @@ class IncidentState(TypedDict):
 
 
 def _default_phase_generator(phase: IncidentPhaseName, context: IncidentContext) -> PlaybookPhase:
-    """Generates one playbook phase via the configured frontier LLM (LangGraph node)."""
+    """Generates one playbook phase via the configured frontier LLM (LangGraph node).
+
+    Uses `with_structured_output` (Anthropic tool-calling under the hood) rather
+    than asking the model to emit raw JSON text — the latter is brittle against
+    newer Claude models, which often wrap JSON in prose or markdown fences that
+    a plain text parser can't handle.
+    """
     from langchain_anthropic import ChatAnthropic
-    from langchain_core.output_parsers import PydanticOutputParser
     from langchain_core.prompts import ChatPromptTemplate
 
     from app.core.config import get_settings
@@ -25,8 +30,8 @@ def _default_phase_generator(phase: IncidentPhaseName, context: IncidentContext)
     if not settings.anthropic_api_key:
         raise RuntimeError("ANTHROPIC_API_KEY is required to generate incident playbooks")
 
-    parser = PydanticOutputParser(pydantic_object=PlaybookPhase)
     llm = ChatAnthropic(model="claude-sonnet-5", api_key=settings.anthropic_api_key)
+    structured_llm = llm.with_structured_output(PlaybookPhase)
     prompt = ChatPromptTemplate.from_messages(
         [
             (
@@ -35,7 +40,7 @@ def _default_phase_generator(phase: IncidentPhaseName, context: IncidentContext)
                 "and non-profits. Produce the '{phase}' phase of a containment playbook with "
                 "an Executive Summary (plain business language) and Technical Remediation "
                 "steps including executable Azure CLI / PowerShell / Google Workspace "
-                "commands.\n{format_instructions}",
+                "commands.",
             ),
             (
                 "human",
@@ -43,10 +48,10 @@ def _default_phase_generator(phase: IncidentPhaseName, context: IncidentContext)
                 "Environment: {environment}\nDescription: {description}",
             ),
         ]
-    ).partial(format_instructions=parser.get_format_instructions())
+    )
 
-    chain = prompt | llm | parser
-    return chain.invoke(
+    chain = prompt | structured_llm
+    result = chain.invoke(
         {
             "phase": phase.value,
             "incident_type": context.incident_type,
@@ -55,6 +60,9 @@ def _default_phase_generator(phase: IncidentPhaseName, context: IncidentContext)
             "description": context.description or "unspecified",
         }
     )
+    # The model fills in `phase` itself; pin it to the value we actually
+    # requested rather than trust its fidelity to the prompt.
+    return result.model_copy(update={"phase": phase})
 
 
 def build_incident_graph(phase_generator: PhaseGenerator | None = None):
