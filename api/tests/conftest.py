@@ -10,9 +10,9 @@ os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
 os.environ.setdefault("JWT_SECRET_KEY", "test-secret")
 
 from app.core.config import get_settings  # noqa: E402
+from app import models as _models  # noqa: E402,F401 register ORM models on Base.metadata
 from app.db.session import Base  # noqa: E402
 from app.main import app  # noqa: E402
-import app.models  # noqa: E402,F401 register ORM models on Base.metadata
 
 
 @pytest.fixture(autouse=True)
