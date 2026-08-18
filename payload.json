@@ -1,0 +1,1 @@
+{"query": "query getService($id: String!) { service(id: $id) { id name serviceInstances { edges { node { environmentId builder rootDirectory source { image repo } } } } } }", "variables": {"id": "335ae3f1-af9b-4aa5-86ee-9ea0729ea5d9"}}
