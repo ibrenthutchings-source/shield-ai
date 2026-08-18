@@ -1,0 +1,1 @@
+{"query": "query getServices($ids: [String!]!) { services: servicesByIds(ids: $ids) { id name serviceInstances { edges { node { environmentId builder rootDirectory startCommand } } } } }", "variables": {"ids": ["335ae3f1-af9b-4aa5-86ee-9ea0729ea5d9", "d1a71794-5db9-4441-a2d0-85998a159077", "32674486-50fc-486f-9318-a637afeb7f11"]}}
