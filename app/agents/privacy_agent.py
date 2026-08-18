@@ -2,13 +2,15 @@ import re
 from typing import Optional, Callable
 import logging
 
+from email_validator import validate_email, EmailNotValidError
+
 logger = logging.getLogger(__name__)
 
 # Regex-based patterns for common sensitive data
 SSN_RE = re.compile(r"\b\d{3}-\d{2}-\d{4}\b")
 CC_RE = re.compile(r"\b(?:\d[ -]*?){13,16}\b")
 STU_RE = re.compile(r"\bSTU-\d{6}\b", re.IGNORECASE)
-EMAIL_RE = re.compile(r"[\w\.-]+@[\w\.-]+\.\w+")
+EMAIL_CANDIDATE_RE = re.compile(r"[\w\.-]+@[\w\.-]+\.\w+")
 
 
 def _luhn_check(number_str: str) -> bool:
@@ -47,8 +49,18 @@ def redact(text: str) -> str:
     text = CC_RE.sub(_cc_replacer, text)
     text = STU_RE.sub("[REDACTED_STUDENT_ID]", text)
 
-    # Email regex is a simple fallback; consider replacing with a validator
-    text = EMAIL_RE.sub("[REDACTED_EMAIL]", text)
+    # For emails, only redact candidates that validate with email-validator
+    def _email_replacer(m: re.Match) -> str:
+        candidate = m.group(0)
+        try:
+            # validate_email throws EmailNotValidError on invalid addresses
+            validate_email(candidate)
+            return "[REDACTED_EMAIL]"
+        except EmailNotValidError:
+            # If it doesn't validate, leave the text unchanged to avoid over-redaction
+            return candidate
+
+    text = EMAIL_CANDIDATE_RE.sub(_email_replacer, text)
     return text
 
 
