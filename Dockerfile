@@ -7,13 +7,20 @@ WORKDIR /app
 
 # Install build deps and runtime requirements
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# Upgrade pip for more reliable installs and then install pinned requirements
+RUN python -m pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
 # Copy source
 COPY . .
 
 # Ensure scripts are executable
 RUN chmod +x /app/scripts/wait_for_postgres.sh || true
+
+# Create an unprivileged user and use it at runtime for better security
+RUN groupadd -r app && useradd -r -g app app \
+    && chown -R app:app /app
+USER app
 
 # Entrypoint waits for Postgres to become available, then execs CMD
 ENTRYPOINT ["/app/scripts/wait_for_postgres.sh"]
