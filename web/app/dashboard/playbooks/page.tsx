@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Kicker } from "@/components/ui/kicker";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -79,7 +80,12 @@ export default function PlaybooksPage() {
   const selectedIncident = incidents.find((i) => i.id === selectedId) ?? null;
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
+    <div className="flex flex-col gap-6">
+      <div>
+        <Kicker>Difesa // Playbooks</Kicker>
+        <h1 className="text-xl font-semibold">Interactive Playbook Executor</h1>
+      </div>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
       <div className="flex flex-col gap-4">
         <Card>
           <CardHeader>
@@ -240,6 +246,7 @@ export default function PlaybooksPage() {
             )}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

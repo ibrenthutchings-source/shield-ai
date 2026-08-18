@@ -9,6 +9,7 @@ import { Badge, severityTone } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Kicker } from "@/components/ui/kicker";
 import { Label } from "@/components/ui/label";
 
 const SEVERITY_RANK: Record<Severity, number> = { critical: 3, high: 2, medium: 1, low: 0 };
@@ -69,6 +70,7 @@ export default function AssetsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
+        <Kicker>Difesa // Asset Surface Map</Kicker>
         <h1 className="text-xl font-semibold">Asset Surface Map</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">
           Passively observed assets mapped against MITRE ATT&amp;CK — no active exploits are run.

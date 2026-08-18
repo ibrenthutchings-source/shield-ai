@@ -6,6 +6,7 @@ import { useAgentStream } from "@/lib/agent-stream-context";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Kicker } from "@/components/ui/kicker";
 
 export default function AgentStreamPage() {
   const { messages, connected, clear } = useAgentStream();
@@ -19,6 +20,7 @@ export default function AgentStreamPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
+          <Kicker>Difesa // Agent Stream</Kicker>
           <h1 className="text-xl font-semibold">Real-Time Agent Stream</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             Live status updates from Difesa's agents as they run.

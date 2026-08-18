@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import type { Asset, Incident, Severity, TechniqueMapping } from "@/lib/types";
 import { Badge, severityTone } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Kicker } from "@/components/ui/kicker";
 
 const SEVERITY_WEIGHT: Record<Severity, number> = { low: 25, medium: 50, high: 75, critical: 100 };
 
@@ -44,17 +45,18 @@ export default function ExecutiveOverviewPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
+        <Kicker>Difesa // Executive Overview</Kicker>
         <h1 className="text-xl font-semibold">Executive Risk Overview</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">
           A business-level summary of your organization&apos;s security posture — no technical background required.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Overall risk score" value={`${riskScore} / 100`} />
-        <StatCard label="Open incidents" value={String(openIncidents)} />
-        <StatCard label="Assets monitored" value={String(assets.length)} />
-        <StatCard label="Critical findings" value={String(criticalFindings)} />
+      <div className="flex gap-8 overflow-x-auto rounded-lg border border-slate-200 bg-white px-5 py-3 dark:border-slate-800 dark:bg-slate-900">
+        <StatStripItem label="Overall risk score" value={`${riskScore} / 100`} tone={riskTone(riskScore)} />
+        <StatStripItem label="Open incidents" value={String(openIncidents)} tone="neutral" />
+        <StatStripItem label="Assets monitored" value={String(assets.length)} tone="neutral" />
+        <StatStripItem label="Critical findings" value={String(criticalFindings)} tone={criticalFindings > 0 ? "critical" : "low"} />
       </div>
 
       <Card>
@@ -104,13 +106,27 @@ export default function ExecutiveOverviewPage() {
   );
 }
 
-function StatCard({ label, value }: { label: string; value: string }) {
+type StatTone = "neutral" | "low" | "critical";
+
+const STAT_TONE_CLASSES: Record<StatTone, string> = {
+  neutral: "text-slate-900 dark:text-slate-100",
+  low: "text-emerald-600 dark:text-emerald-400",
+  critical: "text-red-600 dark:text-red-400",
+};
+
+function riskTone(score: number): StatTone {
+  if (score >= 75) return "critical";
+  if (score === 0) return "low";
+  return "neutral";
+}
+
+function StatStripItem({ label, value, tone }: { label: string; value: string; tone: StatTone }) {
   return (
-    <Card>
-      <CardContent className="flex flex-col gap-1">
-        <span className="text-xs text-slate-500 dark:text-slate-400">{label}</span>
-        <span className="text-2xl font-semibold">{value}</span>
-      </CardContent>
-    </Card>
+    <div className="flex flex-shrink-0 flex-col gap-0.5">
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        {label}
+      </span>
+      <span className={`text-lg font-bold ${STAT_TONE_CLASSES[tone]}`}>{value}</span>
+    </div>
   );
 }
