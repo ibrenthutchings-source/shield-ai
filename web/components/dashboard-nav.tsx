@@ -23,7 +23,7 @@ export function DashboardNav() {
     <header className="border-b border-slate-200 dark:border-slate-800">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
         <div className="flex items-center gap-6">
-          <span className="text-sm font-semibold">ShieldAI</span>
+          <span className="text-sm font-semibold text-difesa-forest dark:text-difesa-cream">Difesa</span>
           <nav className="flex gap-1">
             {LINKS.map((link) => {
               const isActive = pathname === link.href;
@@ -34,7 +34,7 @@ export function DashboardNav() {
                   className={cn(
                     "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
+                      ? "bg-difesa-forest text-white dark:bg-difesa-cream dark:text-difesa-forest"
                       : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
                   )}
                 >
@@ -47,7 +47,7 @@ export function DashboardNav() {
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
             <span
-              className={cn("h-2 w-2 rounded-full", connected ? "bg-emerald-500" : "bg-slate-400")}
+              className={cn("h-2 w-2 rounded-full", connected ? "bg-difesa-leaf" : "bg-slate-400")}
               aria-hidden
             />
             {connected ? "Live" : "Disconnected"}

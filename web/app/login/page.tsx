@@ -40,10 +40,10 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-4">
+    <main className="flex min-h-screen items-center justify-center bg-difesa-cream p-4 dark:bg-slate-950">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>ShieldAI</CardTitle>
+          <CardTitle className="text-difesa-forest dark:text-difesa-cream">Difesa</CardTitle>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             {mode === "login" ? "Sign in to your account" : "Create your organization's account"}
           </p>

@@ -36,7 +36,7 @@ def _default_phase_generator(phase: IncidentPhaseName, context: IncidentContext)
         [
             (
                 "system",
-                "You are ShieldAI's incident response planner for lean IT teams at schools "
+                "You are Difesa's incident response planner for lean IT teams at schools "
                 "and non-profits. Produce the '{phase}' phase of a containment playbook with "
                 "an Executive Summary (plain business language) and Technical Remediation "
                 "steps including executable Azure CLI / PowerShell / Google Workspace "

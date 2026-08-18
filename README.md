@@ -1,2 +1,2 @@
-# shield-ai
+# Difesa
 AI-first tools to assist schools, nonprofits, and small &amp; medium businesses protect valuable information assets. 

@@ -21,7 +21,7 @@ export default function AgentStreamPage() {
         <div>
           <h1 className="text-xl font-semibold">Real-Time Agent Stream</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Live status updates from ShieldAI's agents as they run.
+            Live status updates from Difesa's agents as they run.
           </p>
         </div>
         <Button variant="outline" onClick={clear}>
