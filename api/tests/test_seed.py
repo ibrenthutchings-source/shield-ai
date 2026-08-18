@@ -28,7 +28,8 @@ async def test_seed_creates_user(patched_session, monkeypatch):
     result = await patched_session.execute(select(User).where(User.email == "seed@shieldai.dev"))
     user = result.scalar_one_or_none()
     assert user is not None
-    assert user.org_name == "Seeded Org"
+    assert user.role == "owner"
+    assert user.organization.name == "Seeded Org"
     assert user.hashed_password != "supersecret1"
 
 
@@ -40,7 +41,7 @@ async def test_seed_uses_default_org_name(patched_session, monkeypatch):
     await seed_user()
 
     result = await patched_session.execute(select(User).where(User.email == "seed2@shieldai.dev"))
-    assert result.scalar_one_or_none().org_name == "ShieldAI"
+    assert result.scalar_one_or_none().organization.name == "ShieldAI"
 
 
 async def test_seed_is_idempotent(patched_session, monkeypatch):

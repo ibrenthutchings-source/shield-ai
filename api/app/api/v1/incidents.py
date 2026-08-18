@@ -28,7 +28,7 @@ async def create_incident(
     agent: IncidentResponderAgent = Depends(get_incident_agent),
 ) -> Incident:
     await connection_manager.broadcast(
-        current_user.id,
+        current_user.organization_id,
         {"agent": "incident_responder", "status": "started", "incident_type": payload.incident_type},
     )
 
@@ -44,7 +44,7 @@ async def create_incident(
     except Exception:
         logger.exception("Incident playbook generation failed for %s", payload.incident_type)
         await connection_manager.broadcast(
-            current_user.id,
+            current_user.organization_id,
             {"agent": "incident_responder", "status": "error", "incident_type": payload.incident_type},
         )
         raise HTTPException(
@@ -53,7 +53,8 @@ async def create_incident(
         )
 
     incident = Incident(
-        user_id=current_user.id,
+        organization_id=current_user.organization_id,
+        created_by_user_id=current_user.id,
         incident_type=payload.incident_type,
         environment=payload.environment,
         description=payload.description,
@@ -65,7 +66,7 @@ async def create_incident(
     await db.refresh(incident)
 
     await connection_manager.broadcast(
-        current_user.id,
+        current_user.organization_id,
         {"agent": "incident_responder", "status": "completed", "incident_id": str(incident.id)},
     )
 
@@ -78,7 +79,9 @@ async def list_incidents(
     current_user: User = Depends(get_current_user),
 ) -> list[Incident]:
     result = await db.execute(
-        select(Incident).where(Incident.user_id == current_user.id).order_by(Incident.created_at.desc())
+        select(Incident)
+        .where(Incident.organization_id == current_user.organization_id)
+        .order_by(Incident.created_at.desc())
     )
     return list(result.scalars().all())
 
@@ -90,7 +93,9 @@ async def get_incident(
     current_user: User = Depends(get_current_user),
 ) -> Incident:
     result = await db.execute(
-        select(Incident).where(Incident.id == incident_id, Incident.user_id == current_user.id)
+        select(Incident).where(
+            Incident.id == incident_id, Incident.organization_id == current_user.organization_id
+        )
     )
     incident = result.scalar_one_or_none()
     if incident is None:

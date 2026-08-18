@@ -7,7 +7,8 @@ def test_register_creates_user(client):
     assert response.status_code == 201
     body = response.json()
     assert body["email"] == "admin@school.org"
-    assert body["org_name"] == "Riverside Charter"
+    assert body["role"] == "owner"
+    assert body["organization"]["name"] == "Riverside Charter"
     assert "id" in body
     assert "password" not in body
     assert "hashed_password" not in body

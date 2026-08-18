@@ -12,7 +12,10 @@ class Asset(Base):
     __tablename__ = "assets"
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), index=True)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(as_uuid=True), ForeignKey("organizations.id"), index=True
+    )
+    created_by_user_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"))
     host: Mapped[str] = mapped_column(String(255))
     port: Mapped[int | None] = mapped_column(Integer, nullable=True)
     service: Mapped[str | None] = mapped_column(String(100), nullable=True)

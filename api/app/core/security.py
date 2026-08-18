@@ -37,3 +37,33 @@ def decode_access_token(token: str) -> str:
     if not subject:
         raise ValueError("Token missing subject")
     return subject
+
+
+INVITE_EXPIRE_DAYS = 7
+
+
+def create_invite_token(email: str, organization_id: str) -> tuple[str, int]:
+    """Returns (token, expires_at unix timestamp)."""
+    settings = get_settings()
+    expire = datetime.now(timezone.utc) + timedelta(days=INVITE_EXPIRE_DAYS)
+    payload = {"sub": email, "org_id": organization_id, "type": "invite", "exp": expire}
+    token = jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
+    return token, int(expire.timestamp())
+
+
+def decode_invite_token(token: str) -> tuple[str, str]:
+    """Returns (email, organization_id)."""
+    settings = get_settings()
+    try:
+        payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
+    except JWTError as exc:
+        raise ValueError("Invalid or expired invite token") from exc
+
+    if payload.get("type") != "invite":
+        raise ValueError("Token is not an invite token")
+
+    email = payload.get("sub")
+    organization_id = payload.get("org_id")
+    if not email or not organization_id:
+        raise ValueError("Invite token missing claims")
+    return email, organization_id

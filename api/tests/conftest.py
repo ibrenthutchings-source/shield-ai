@@ -40,6 +40,19 @@ async def db_session():
     await engine.dispose()
 
 
+class _NonClosingSessionContext:
+    """Wraps the shared test session so `async with` doesn't close it early."""
+
+    def __init__(self, session):
+        self._session = session
+
+    async def __aenter__(self):
+        return self._session
+
+    async def __aexit__(self, *exc_info):
+        return False
+
+
 @pytest.fixture
 def client(db_session, monkeypatch):
     from unittest.mock import AsyncMock
@@ -52,6 +65,13 @@ def client(db_session, monkeypatch):
 
     async def _override_get_db():
         yield db_session
+
+    # The websocket handler can't use Depends(get_db) (no per-request DI on a
+    # socket), so it opens its own session via AsyncSessionLocal directly —
+    # point that at the same test database too.
+    monkeypatch.setattr(
+        "app.ws.agent_stream.AsyncSessionLocal", lambda: _NonClosingSessionContext(db_session)
+    )
 
     app.dependency_overrides[get_db] = _override_get_db
     with TestClient(app) as test_client:

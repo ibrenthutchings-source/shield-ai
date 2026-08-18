@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import assets, auth, incidents
+from app.api.v1 import assets, auth, incidents, organizations
 from app.core.config import get_settings
 from app.db.init_db import init_db
 from app.ws import agent_stream
@@ -33,6 +33,7 @@ app.add_middleware(
 
 
 app.include_router(auth.router)
+app.include_router(organizations.router)
 app.include_router(incidents.router)
 app.include_router(assets.router)
 app.include_router(agent_stream.router)

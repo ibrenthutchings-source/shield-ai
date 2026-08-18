@@ -18,6 +18,7 @@ from sqlalchemy import select
 
 from app.core.security import hash_password
 from app.db.session import AsyncSessionLocal
+from app.models.organization import Organization
 from app.models.user import User
 
 
@@ -33,6 +34,7 @@ def _require_env(name: str) -> str:
 
 
 async def seed_user() -> None:
+    """Creates a new organization with this user as its owner, if the email isn't taken yet."""
     email = _require_env("SEED_USER_EMAIL")
     password = _require_env("SEED_USER_PASSWORD")
     org_name = os.environ.get("SEED_USER_ORG_NAME", "ShieldAI")
@@ -43,10 +45,19 @@ async def seed_user() -> None:
             print(f"User {email} already exists, skipping.")
             return
 
-        user = User(email=email, hashed_password=hash_password(password), org_name=org_name)
+        organization = Organization(name=org_name)
+        session.add(organization)
+        await session.flush()
+
+        user = User(
+            email=email,
+            hashed_password=hash_password(password),
+            organization_id=organization.id,
+            role="owner",
+        )
         session.add(user)
         await session.commit()
-        print(f"Created user {email} ({org_name}).")
+        print(f"Created user {email}, owner of organization {org_name!r}.")
 
 
 def main() -> None:

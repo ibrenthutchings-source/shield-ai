@@ -13,8 +13,24 @@ def test_agent_stream_rejects_invalid_token(client):
         assert False, "expected the connection to be rejected"
 
 
-def test_agent_stream_accepts_valid_token(client):
+def test_agent_stream_rejects_token_for_unknown_user(client):
     token = create_access_token(subject=str(uuid.uuid4()))
+
+    try:
+        with client.websocket_connect(f"/ws/agent-stream?token={token}"):
+            pass
+    except Exception:
+        pass
+    else:
+        assert False, "expected the connection to be rejected"
+
+
+def test_agent_stream_accepts_valid_token(client):
+    register = client.post(
+        "/api/v1/auth/register",
+        json={"email": "ws-user@school.org", "password": "supersecret1", "org_name": "Org"},
+    )
+    token = create_access_token(subject=register.json()["id"])
 
     with client.websocket_connect(f"/ws/agent-stream?token={token}") as websocket:
         websocket.close()

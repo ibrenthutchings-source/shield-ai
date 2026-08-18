@@ -24,7 +24,8 @@ async def create_asset(
     assessment = agent.assess([payload])
 
     asset = Asset(
-        user_id=current_user.id,
+        organization_id=current_user.organization_id,
+        created_by_user_id=current_user.id,
         host=payload.host,
         port=payload.port,
         service=payload.service,
@@ -37,7 +38,7 @@ async def create_asset(
     await db.refresh(asset)
 
     await connection_manager.broadcast(
-        current_user.id,
+        current_user.organization_id,
         {
             "agent": "redteam_simulation",
             "status": "completed",
@@ -55,6 +56,8 @@ async def list_assets(
     current_user: User = Depends(get_current_user),
 ) -> list[Asset]:
     result = await db.execute(
-        select(Asset).where(Asset.user_id == current_user.id).order_by(Asset.created_at.desc())
+        select(Asset)
+        .where(Asset.organization_id == current_user.organization_id)
+        .order_by(Asset.created_at.desc())
     )
     return list(result.scalars().all())
